@@ -2,17 +2,19 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { user, transactions, alerts } from "../../data/mockData";
+import { transactions, alerts } from "../../data/mockData";
 import { getFinancialState, getStatus } from "../../data/state";
 
 export default function Dashboard() {
+  const [name, setName] = useState("Usuario");
   const [spent, setSpent] = useState(0);
   const [budget, setBudget] = useState(6000);
   const [status, setStatus] = useState("Cargando...");
 
-  // 🔹 Cargar estado financiero
   useEffect(() => {
     const state = getFinancialState();
+
+    setName(state.name);
     setSpent(state.spent);
     setBudget(state.budget);
     setStatus(getStatus());
@@ -26,8 +28,8 @@ export default function Dashboard() {
 
         {/* Header */}
         <div>
-          <p className="text-gray-400">Hola, {user.name}</p>
-          <h1 className="text-4xl font-bold">Q {user.balance}</h1>
+          <p className="text-gray-400">Hola, {name}</p>
+          <h1 className="text-4xl font-bold">Q {budget - spent}</h1>
 
           {/* Barra dinámica */}
           <div className="mt-3">
@@ -61,7 +63,7 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* Alertas dinámicas */}
+        {/* Alertas */}
         <div className="bg-white/5 p-4 rounded-2xl">
           <h2 className="mb-3 text-sm text-gray-300">Alertas de LUCID</h2>
 
