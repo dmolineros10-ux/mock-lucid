@@ -8,7 +8,7 @@ export default function Dashboard() {
   const [name, setName] = useState("Usuario");
   const [spent, setSpent] = useState(0);
   const [budget, setBudget] = useState(6000);
-  const [status, setStatus] = useState("Cargando...");
+  const [status, setStatus] = useState("");
   const [transactions, setTransactions] = useState<any[]>([]);
 
   useEffect(() => {
@@ -22,25 +22,43 @@ export default function Dashboard() {
   }, []);
 
   const percentage = Math.min((spent / budget) * 100, 100);
+  const remaining = budget - spent;
 
   return (
     <main className="min-h-screen bg-[#0b0f14] flex justify-center">
       <div className="w-full max-w-md p-6 space-y-6 text-white">
 
-        {/* Header */}
+        {/* HEADER */}
         <div>
           <p className="text-gray-400">Hola, {name}</p>
-          <h1 className="text-4xl font-bold">Q {budget - spent}</h1>
+          <h1 className="text-4xl font-bold">Q {remaining}</h1>
 
+          {/* Progress bar */}
           <div className="mt-3">
             <div className="h-2 bg-white/10 rounded-full">
               <div
-                className="h-2 bg-yellow-400 rounded-full"
+                className={`h-2 rounded-full ${
+                  percentage > 80
+                    ? "bg-red-500"
+                    : percentage > 50
+                    ? "bg-yellow-400"
+                    : "bg-green-400"
+                }`}
                 style={{ width: `${percentage}%` }}
-              ></div>
+              />
             </div>
 
-            <p className="text-yellow-400 mt-2 text-sm">{status}</p>
+            <p
+              className={`mt-2 text-sm ${
+                percentage > 80
+                  ? "text-red-400"
+                  : percentage > 50
+                  ? "text-yellow-400"
+                  : "text-green-400"
+              }`}
+            >
+              {status}
+            </p>
 
             <p className="text-gray-400 text-sm mt-1">
               Has gastado Q {spent} de Q {budget}
@@ -48,16 +66,18 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Gastos reales */}
-        <div className="bg-white/5 p-4 rounded-2xl">
-          <h2 className="mb-3 text-sm text-gray-300">Últimos gastos</h2>
+        {/* GASTOS REALES */}
+        <div className="bg-white/5 p-4 rounded-2xl backdrop-blur-md">
+          <h2 className="mb-3 text-sm text-gray-300 font-semibold">
+            Últimos gastos
+          </h2>
 
           {transactions.length === 0 ? (
             <p className="text-gray-400 text-sm">
-              No hay gastos registrados todavía.
+              Aún no tienes gastos registrados.
             </p>
           ) : (
-            transactions.map((t, i) => (
+            transactions.slice(0, 5).map((t, i) => (
               <div
                 key={i}
                 className="flex justify-between py-2 border-b border-white/10 last:border-none"
@@ -69,13 +89,15 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Alertas dinámicas */}
-        <div className="bg-white/5 p-4 rounded-2xl">
-          <h2 className="mb-3 text-sm text-gray-300">Alertas de LUCID</h2>
+        {/* ALERTAS DINÁMICAS */}
+        <div className="bg-white/5 p-4 rounded-2xl backdrop-blur-md">
+          <h2 className="mb-3 text-sm text-gray-300 font-semibold">
+            Alertas de LUCID
+          </h2>
 
           {spent > budget * 0.7 && (
-            <p className="text-red-400 text-sm mb-1">
-              ● Ya estás entrando en zona peligrosa
+            <p className="text-yellow-400 text-sm mb-1">
+              ● Estás entrando en zona de riesgo
             </p>
           )}
 
@@ -90,7 +112,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* Botón */}
+        {/* BOTÓN CHAT */}
         <Link
           href="/chat"
           className="block text-center bg-green-500 py-3 rounded-xl text-black font-semibold"
