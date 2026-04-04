@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { transactions, alerts } from "../../data/mockData";
 import { getFinancialState, getStatus } from "../../data/state";
 
 export default function Dashboard() {
@@ -10,6 +9,7 @@ export default function Dashboard() {
   const [spent, setSpent] = useState(0);
   const [budget, setBudget] = useState(6000);
   const [status, setStatus] = useState("Cargando...");
+  const [transactions, setTransactions] = useState<any[]>([]);
 
   useEffect(() => {
     const state = getFinancialState();
@@ -17,6 +17,7 @@ export default function Dashboard() {
     setName(state.name);
     setSpent(state.spent);
     setBudget(state.budget);
+    setTransactions(state.transactions || []);
     setStatus(getStatus());
   }, []);
 
@@ -31,7 +32,6 @@ export default function Dashboard() {
           <p className="text-gray-400">Hola, {name}</p>
           <h1 className="text-4xl font-bold">Q {budget - spent}</h1>
 
-          {/* Barra dinámica */}
           <div className="mt-3">
             <div className="h-2 bg-white/10 rounded-full">
               <div
@@ -48,22 +48,28 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Gastos */}
+        {/* Gastos reales */}
         <div className="bg-white/5 p-4 rounded-2xl">
           <h2 className="mb-3 text-sm text-gray-300">Últimos gastos</h2>
 
-          {transactions.map((t, i) => (
-            <div
-              key={i}
-              className="flex justify-between py-2 border-b border-white/10 last:border-none"
-            >
-              <span>{t.name}</span>
-              <span className="text-gray-300">Q {t.amount}</span>
-            </div>
-          ))}
+          {transactions.length === 0 ? (
+            <p className="text-gray-400 text-sm">
+              No hay gastos registrados todavía.
+            </p>
+          ) : (
+            transactions.map((t, i) => (
+              <div
+                key={i}
+                className="flex justify-between py-2 border-b border-white/10 last:border-none"
+              >
+                <span>{t.name}</span>
+                <span className="text-gray-300">Q {t.amount}</span>
+              </div>
+            ))
+          )}
         </div>
 
-        {/* Alertas */}
+        {/* Alertas dinámicas */}
         <div className="bg-white/5 p-4 rounded-2xl">
           <h2 className="mb-3 text-sm text-gray-300">Alertas de LUCID</h2>
 
@@ -79,12 +85,9 @@ export default function Dashboard() {
             </p>
           )}
 
-          {alerts.map((a, i) => (
-            <div key={i} className="flex gap-2 mb-2 text-sm">
-              <span className="text-yellow-400">●</span>
-              <p className="text-gray-300">{a}</p>
-            </div>
-          ))}
+          <p className="text-gray-300 text-sm">
+            ● Tus decisiones están definiendo tu mes
+          </p>
         </div>
 
         {/* Botón */}
