@@ -1,13 +1,22 @@
 export const getFinancialState = () => {
   const saved = localStorage.getItem("lucid_state");
 
-  if (saved) return JSON.parse(saved);
+  if (saved) {
+    const parsed = JSON.parse(saved);
+
+    return {
+      name: parsed.name || "Usuario",
+      budget: parsed.budget || 6000,
+      spent: parsed.spent || 0,
+      transactions: parsed.transactions || [], // 🔥 FIX clave
+    };
+  }
 
   return {
     name: "Usuario",
     budget: 6000,
     spent: 0,
-    transactions: [], // 🔥 NUEVO
+    transactions: [],
   };
 };
 
@@ -23,7 +32,12 @@ export const setUserData = (name: string, budget: number) => {
 export const addTransaction = (name: string, amount: number) => {
   const state = getFinancialState();
 
-  state.transactions.unshift({ name, amount }); // 🔥 guarda al inicio
+  // 🔥 asegurarse que siempre exista
+  if (!state.transactions) {
+    state.transactions = [];
+  }
+
+  state.transactions.unshift({ name, amount });
   state.spent += amount;
 
   localStorage.setItem("lucid_state", JSON.stringify(state));
