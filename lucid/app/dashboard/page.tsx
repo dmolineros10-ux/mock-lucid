@@ -11,7 +11,7 @@ export default function Dashboard() {
   const [status, setStatus] = useState("");
   const [transactions, setTransactions] = useState<any[]>([]);
 
-  useEffect(() => {
+  const loadData = () => {
     const state = getFinancialState();
 
     setName(state.name);
@@ -19,6 +19,17 @@ export default function Dashboard() {
     setBudget(state.budget);
     setTransactions(state.transactions || []);
     setStatus(getStatus());
+  };
+
+  useEffect(() => {
+    loadData();
+
+    // 🔥 refresco automático cada vez que vuelves a la pestaña
+    window.addEventListener("focus", loadData);
+
+    return () => {
+      window.removeEventListener("focus", loadData);
+    };
   }, []);
 
   const percentage = Math.min((spent / budget) * 100, 100);
@@ -33,7 +44,6 @@ export default function Dashboard() {
           <p className="text-gray-400">Hola, {name}</p>
           <h1 className="text-4xl font-bold">Q {remaining}</h1>
 
-          {/* Progress bar */}
           <div className="mt-3">
             <div className="h-2 bg-white/10 rounded-full">
               <div
@@ -89,7 +99,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* ALERTAS DINÁMICAS */}
+        {/* ALERTAS */}
         <div className="bg-white/5 p-4 rounded-2xl backdrop-blur-md">
           <h2 className="mb-3 text-sm text-gray-300 font-semibold">
             Alertas de LUCID
@@ -112,7 +122,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* BOTÓN CHAT */}
+        {/* BOTÓN */}
         <Link
           href="/chat"
           className="block text-center bg-green-500 py-3 rounded-xl text-black font-semibold"
