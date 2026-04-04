@@ -7,6 +7,7 @@ export const getFinancialState = () => {
     name: "Usuario",
     budget: 6000,
     spent: 0,
+    transactions: [], // 🔥 NUEVO
   };
 };
 
@@ -19,8 +20,10 @@ export const setUserData = (name: string, budget: number) => {
   localStorage.setItem("lucid_state", JSON.stringify(state));
 };
 
-export const updateSpent = (amount: number) => {
+export const addTransaction = (name: string, amount: number) => {
   const state = getFinancialState();
+
+  state.transactions.unshift({ name, amount }); // 🔥 guarda al inicio
   state.spent += amount;
 
   localStorage.setItem("lucid_state", JSON.stringify(state));

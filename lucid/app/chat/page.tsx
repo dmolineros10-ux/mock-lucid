@@ -1,12 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
-import { updateSpent, getStatus, getFinancialState } from "../../data/state";
+import { addTransaction, getStatus, getFinancialState } from "../../data/state";
 
 export default function Chat() {
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState("");
 
-  // 🔹 Cargar historial
   useEffect(() => {
     const saved = localStorage.getItem("lucid_chat");
 
@@ -22,7 +21,6 @@ export default function Chat() {
     }
   }, []);
 
-  // 🔹 Guardar historial
   useEffect(() => {
     if (messages.length > 0) {
       localStorage.setItem("lucid_chat", JSON.stringify(messages));
@@ -34,68 +32,38 @@ export default function Chat() {
 
     const text = input.toLowerCase();
 
-    // 🔹 Estado financiero
-    const status = getStatus();
     const { budget, spent } = getFinancialState();
     const remaining = budget - spent;
-
-    // 🔹 Historial reciente
-    const recentMessages = messages.slice(-6);
-    const userMessages = recentMessages.filter((m) => m.role === "user");
-
-    const spendingMentions = userMessages.filter((m) =>
-      m.text.match(/\d+/)
-    ).length;
-
-    const impulseMentions = userMessages.filter((m) =>
-      m.text.toLowerCase().includes("comprar") ||
-      m.text.toLowerCase().includes("salir")
-    ).length;
+    const status = getStatus();
 
     // 🔹 Detectar monto
     const amountMatch = text.match(/\d+/);
     const amount = amountMatch ? parseInt(amountMatch[0]) : null;
 
-    // 🔹 Guardar gasto
+    // 🔹 Detectar categoría simple
+    let category = "Gasto";
+
+    if (text.includes("comida")) category = "Comida";
+    else if (text.includes("uber") || text.includes("transporte")) category = "Transporte";
+    else if (text.includes("spotify") || text.includes("netflix")) category = "Suscripciones";
+    else if (text.includes("fiesta") || text.includes("salir")) category = "Ocio";
+
+    // 🔥 GUARDAR TRANSACCIÓN
     if (amount) {
-      updateSpent(amount);
+      addTransaction(category, amount);
     }
 
     let reply = "";
 
-    // 🔥 PRIORIDAD: estado financiero + contexto real
+    // 🔥 PRIORIDAD: estado financiero
     if (status === "Te estás pasando") {
       reply = `Ya te estás pasando… te quedan Q ${remaining}. Esto ya no es buena idea.`;
     } 
     else if (status === "Vas un poco rápido") {
       reply = `Vas acelerando… te quedan Q ${remaining}. Esto suma más de lo que creés.`;
-    }
-
-    // 🔹 comportamiento
-    else if (spendingMentions >= 3) {
-      reply = "Estás gastando seguido… ¿te diste cuenta?";
     } 
-    else if (impulseMentions >= 2) {
-      reply = "Últimamente todo suena a impulso.";
-    } 
-
-    // 🔹 monto
     else if (amount) {
-      if (amount < 100) reply = "No es mucho… pero tampoco es necesario.";
-      else if (amount < 300) reply = "Podés. Pero ya empieza a sumar.";
-      else if (amount < 600) reply = "Podés… pero mañana lo vas a sentir.";
-      else reply = "Esto ya no es un gasto chico. Pensalo bien.";
-    } 
-
-    // 🔹 intención
-    else if (text.includes("salir")) {
-      reply = "Salir siempre suena bien… hasta que ves tu cuenta mañana.";
-    } 
-    else if (text.includes("comprar")) {
-      reply = "¿Lo querés o lo necesitás?";
-    } 
-    else if (text.includes("puedo")) {
-      reply = "Podés. La pregunta es si deberías.";
+      reply = `Ok. Registré Q ${amount} en ${category}.`;
     } 
     else {
       reply = "No es la primera vez que pensás esto.";
