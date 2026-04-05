@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getFinancialState, getStatus } from "../../data/state";
+import BottomNav from "../components/BottomNav";
 
 export default function Dashboard() {
   const [name, setName] = useState("Usuario");
@@ -24,12 +25,8 @@ export default function Dashboard() {
   useEffect(() => {
     loadData();
 
-    // 🔥 refresco automático cada vez que vuelves a la pestaña
     window.addEventListener("focus", loadData);
-
-    return () => {
-      window.removeEventListener("focus", loadData);
-    };
+    return () => window.removeEventListener("focus", loadData);
   }, []);
 
   const percentage = Math.min((spent / budget) * 100, 100);
@@ -37,48 +34,55 @@ export default function Dashboard() {
 
   return (
     <main className="min-h-screen bg-[#0b0f14] flex justify-center">
-      <div className="w-full max-w-md p-6 space-y-6 text-white">
+      <div className="w-full max-w-md p-6 pb-24 space-y-6 text-white">
 
         {/* HEADER */}
-        <div>
-          <p className="text-gray-400">Hola, {name}</p>
-          <h1 className="text-4xl font-bold">Q {remaining}</h1>
+        <div className="flex justify-between items-center">
+          <div>
+            <p className="text-gray-400 text-sm">Hola, {name}</p>
+            <h1 className="text-4xl font-bold">Q {remaining}</h1>
+          </div>
 
-          <div className="mt-3">
-            <div className="h-2 bg-white/10 rounded-full">
-              <div
-                className={`h-2 rounded-full ${
-                  percentage > 80
-                    ? "bg-red-500"
-                    : percentage > 50
-                    ? "bg-yellow-400"
-                    : "bg-green-400"
-                }`}
-                style={{ width: `${percentage}%` }}
-              />
-            </div>
-
-            <p
-              className={`mt-2 text-sm ${
-                percentage > 80
-                  ? "text-red-400"
-                  : percentage > 50
-                  ? "text-yellow-400"
-                  : "text-green-400"
-              }`}
-            >
-              {status}
-            </p>
-
-            <p className="text-gray-400 text-sm mt-1">
-              Has gastado Q {spent} de Q {budget}
-            </p>
+          <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-black font-bold">
+            L
           </div>
         </div>
 
-        {/* GASTOS REALES */}
-        <div className="bg-white/5 p-4 rounded-2xl backdrop-blur-md">
-          <h2 className="mb-3 text-sm text-gray-300 font-semibold">
+        {/* PROGRESO */}
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg p-4 rounded-2xl">
+          <div className="h-2 bg-white/10 rounded-full">
+            <div
+              className={`h-2 rounded-full ${
+                percentage > 80
+                  ? "bg-red-500"
+                  : percentage > 50
+                  ? "bg-yellow-400"
+                  : "bg-green-400"
+              }`}
+              style={{ width: `${percentage}%` }}
+            />
+          </div>
+
+          <p
+            className={`mt-2 text-sm ${
+              percentage > 80
+                ? "text-red-400"
+                : percentage > 50
+                ? "text-yellow-400"
+                : "text-green-400"
+            }`}
+          >
+            {status}
+          </p>
+
+          <p className="text-gray-400 text-sm mt-1">
+            Has gastado Q {spent} de Q {budget}
+          </p>
+        </div>
+
+        {/* GASTOS */}
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg p-4 rounded-2xl">
+          <h2 className="mb-3 text-sm text-gray-400 tracking-wide">
             Últimos gastos
           </h2>
 
@@ -100,8 +104,8 @@ export default function Dashboard() {
         </div>
 
         {/* ALERTAS */}
-        <div className="bg-white/5 p-4 rounded-2xl backdrop-blur-md">
-          <h2 className="mb-3 text-sm text-gray-300 font-semibold">
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 shadow-lg p-4 rounded-2xl">
+          <h2 className="mb-3 text-sm text-gray-400 tracking-wide">
             Alertas de LUCID
           </h2>
 
@@ -125,12 +129,15 @@ export default function Dashboard() {
         {/* BOTÓN */}
         <Link
           href="/chat"
-          className="block text-center bg-green-500 py-3 rounded-xl text-black font-semibold"
+          className="block text-center bg-green-500 py-3 rounded-xl text-black font-semibold shadow-lg"
         >
           Abrir chat con LUCID
         </Link>
 
       </div>
+
+      {/* 🔥 NAVBAR INFERIOR */}
+      <BottomNav />
     </main>
   );
 }
