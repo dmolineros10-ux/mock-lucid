@@ -41,16 +41,16 @@ export default function Chat() {
     const amount = amountMatch ? parseInt(amountMatch[0]) : null;
 
     // 🔹 Detectar categoría simple
-    let category = "Gasto";
+    let category = "otros";
 
-    if (text.includes("comida")) category = "Comida";
-    else if (text.includes("uber") || text.includes("transporte")) category = "Transporte";
-    else if (text.includes("spotify") || text.includes("netflix")) category = "Suscripciones";
-    else if (text.includes("fiesta") || text.includes("salir")) category = "Ocio";
+if (text.includes("comida")) category = "food";
+else if (text.includes("uber") || text.includes("transporte")) category = "transport";
+else if (text.includes("spotify") || text.includes("netflix")) category = "subscriptions";
+else if (text.includes("fiesta") || text.includes("salir")) category = "leisure";
 
     // 🔥 GUARDAR TRANSACCIÓN
     if (amount) {
-      addTransaction(category, amount);
+      addTransaction(category, amount, category);
     }
 
     let reply = "";

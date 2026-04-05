@@ -29,15 +29,19 @@ export const setUserData = (name: string, budget: number) => {
   localStorage.setItem("lucid_state", JSON.stringify(state));
 };
 
-export const addTransaction = (name: string, amount: number) => {
+export const addTransaction = (name: string, amount: number, category: string) => {
   const state = getFinancialState();
 
-  // 🔥 asegurarse que siempre exista
   if (!state.transactions) {
     state.transactions = [];
   }
 
-  state.transactions.unshift({ name, amount });
+  state.transactions.unshift({
+    name,
+    amount,
+    category, // 🔥 NUEVO
+  });
+
   state.spent += amount;
 
   localStorage.setItem("lucid_state", JSON.stringify(state));
