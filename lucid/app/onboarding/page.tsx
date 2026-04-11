@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Logo from "../components/Logo";
+import Logo from "@/app/components/Logo";
 import { setUserData } from "../../data/state";
 
 export default function Onboarding() {

@@ -2,20 +2,36 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Logo from "../components/Logo";
-import BottomNav from "../components/BottomNav";
-import { getFinancialState, getStatus } from "../../data/state";
+
+import Logo from "@/app/components/Logo";
+import BottomNav from "@/app/components/BottomNav";
+import SpendingChart from "@/app/components/SpendingChart";
+
+import {
+  getFinancialState,
+  getStatus,
+  getPrediction,
+  getInsights,
+} from "@/data/state";
 
 export default function Dashboard() {
   const [state, setState] = useState<any>(null);
+  const [prediction, setPrediction] = useState<any>(null);
+  const [insights, setInsights] = useState<string[]>([]);
 
   useEffect(() => {
     setState(getFinancialState());
+    setPrediction(getPrediction());
+    setInsights(getInsights());
   }, []);
 
   if (!state) return null;
 
-  const percentage = Math.min((state.spent / state.budget) * 100, 100);
+  const percentage = Math.min(
+    (state.spent / state.budget) * 100,
+    100
+  );
+
   const remaining = state.budget - state.spent;
 
   return (
@@ -59,45 +75,42 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* GASTOS */}
-        <div className="bg-white/5 p-4 rounded-2xl">
-          <h2 className="text-sm text-gray-300 mb-3">
-            Últimos gastos
+        {/* 🔥 PREDICCIÓN */}
+        {prediction && (
+          <div className="bg-white/5 p-4 rounded-2xl">
+            <p className="text-sm text-yellow-400 mb-1">
+              ⚠️ A este ritmo:
+            </p>
+
+            <p className="text-sm">
+              Te quedas sin dinero en{" "}
+              <span className="font-bold">
+                {prediction.daysLeft} días
+              </span>
+            </p>
+          </div>
+        )}
+
+        {/* 🔥 INSIGHTS */}
+        <div className="bg-white/5 p-4 rounded-2xl space-y-2">
+          <h2 className="text-sm text-gray-300">
+            Insights de LUCID
           </h2>
 
-          {state.transactions.length === 0 ? (
-            <p className="text-gray-400 text-sm">
-              No hay gastos aún.
+          {insights.map((insight, i) => (
+            <p
+              key={i}
+              className="text-sm text-white"
+            >
+              ● {insight}
             </p>
-          ) : (
-            state.transactions.slice(0, 5).map((t: any, i: number) => (
-              <div
-                key={i}
-                className="flex justify-between py-2 border-b border-white/10 last:border-none"
-              >
-                <div>
-                  <p>{t.name}</p>
-                  <p className="text-xs text-gray-500">
-                    {t.category}
-                  </p>
-                </div>
-                <p>Q {t.amount}</p>
-              </div>
-            ))
-          )}
+          ))}
         </div>
 
-        {/* ALERTAS */}
-        <div className="bg-white/5 p-4 rounded-2xl">
-          <p className="text-green-400 text-sm">
-            ● {getStatus()}
-          </p>
-          <p className="text-gray-400 text-sm">
-            Tus decisiones hoy definen tu fin de mes.
-          </p>
-        </div>
+        {/* GRÁFICO */}
+        <SpendingChart />
 
-        {/* BOTÓN CHAT */}
+        {/* BOTÓN */}
         <Link
           href="/chat"
           className="block text-center bg-green-500 py-3 rounded-xl text-black font-semibold"
